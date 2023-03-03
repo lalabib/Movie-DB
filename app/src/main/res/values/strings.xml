@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MovieDb</string>
+    <string name="title">Title</string>
+    <string name="poster">Poster of Movie</string>
+    <string name="description_title">Overview</string>
+    <string name="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet consectetur adipiscing elit duis. Feugiat vivamus at augue eget arcu dictum varius duis.</string>
+    <string name="vote_average">6.6</string>
+    <string name="release_date_title">Release Date</string>
+    <string name="release_date">10–03–2020</string>
+    <string name="home_title">Movie</string>
+    <string name="detail_title">Detail</string>
+</resources>
