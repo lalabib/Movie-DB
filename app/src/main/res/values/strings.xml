@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">MovieDb</string>
+    <string name="popular_movie">Popular Movie</string>
+    <string name="top_rated">Top Rated</string>
+    <string name="now_playing">Now Playing</string>
     <string name="title">Title</string>
     <string name="poster">Poster of Movie</string>
     <string name="description_title">Overview</string>
