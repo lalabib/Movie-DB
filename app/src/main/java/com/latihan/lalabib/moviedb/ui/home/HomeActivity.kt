@@ -1,5 +1,6 @@
 package com.latihan.lalabib.moviedb.ui.home
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -11,6 +12,7 @@ import com.latihan.lalabib.moviedb.adapter.NowPlayingMovieAdapter
 import com.latihan.lalabib.moviedb.adapter.PopularMovieAdapter
 import com.latihan.lalabib.moviedb.adapter.TopRatedMovieAdapter
 import com.latihan.lalabib.moviedb.databinding.ActivityHomeBinding
+import com.latihan.lalabib.moviedb.ui.detail.DetailActivity
 import com.latihan.lalabib.moviedb.utils.Status
 import com.latihan.lalabib.moviedb.utils.ViewModelFactory
 
@@ -40,7 +42,12 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupPopularMovie() {
-        val popularMovieAdapter = PopularMovieAdapter()
+        val popularMovieAdapter = PopularMovieAdapter {
+            Intent(this@HomeActivity, DetailActivity::class.java).apply {
+                putExtra(DetailActivity.EXTRA_DATA, it.id)
+                startActivity(this)
+            }
+        }
 
         homeViewModel.getPopularMovie().observe(this) { movie ->
             if (movie != null) {
@@ -68,7 +75,12 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupTopRatedMovie() {
-        val topRatedMovieAdapter = TopRatedMovieAdapter()
+        val topRatedMovieAdapter = TopRatedMovieAdapter {
+            Intent(this@HomeActivity, DetailActivity::class.java).apply {
+                putExtra(DetailActivity.EXTRA_DATA, it.id)
+                startActivity(this)
+            }
+        }
 
         homeViewModel.getTopRatedMovie().observe(this) { movie ->
             if (movie != null) {
@@ -96,7 +108,12 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupNowPlayingMovie() {
-        val nowPlayingMovieAdapter = NowPlayingMovieAdapter()
+        val nowPlayingMovieAdapter = NowPlayingMovieAdapter {
+            Intent(this@HomeActivity, DetailActivity::class.java).apply {
+                putExtra(DetailActivity.EXTRA_DATA, it.id)
+                startActivity(this)
+            }
+        }
 
         homeViewModel.getNowPlayingMovie().observe(this) { movie ->
             if (movie != null) {

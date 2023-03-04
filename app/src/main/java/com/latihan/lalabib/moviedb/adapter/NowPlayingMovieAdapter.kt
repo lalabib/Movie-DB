@@ -12,7 +12,7 @@ import com.latihan.lalabib.moviedb.data.local.entity.NowPlayingMovieEntity
 import com.latihan.lalabib.moviedb.databinding.ItemMovieBinding
 import com.latihan.lalabib.moviedb.utils.IMG_URL
 
-class NowPlayingMovieAdapter :
+class NowPlayingMovieAdapter(private val onItemClick: (NowPlayingMovieEntity) -> Unit) :
     ListAdapter<NowPlayingMovieEntity, NowPlayingMovieAdapter.MovieViewHolder>(DIFFUTIL) {
 
     object DIFFUTIL : DiffUtil.ItemCallback<NowPlayingMovieEntity>() {
@@ -23,17 +23,15 @@ class NowPlayingMovieAdapter :
         override fun areContentsTheSame(oldItem: NowPlayingMovieEntity, newItem: NowPlayingMovieEntity): Boolean {
             return oldItem.id == newItem.id
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
-        return MovieViewHolder(
-            ItemMovieBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+        val binding = ItemMovieBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
+        return MovieViewHolder(binding, onItemClick)
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
@@ -41,7 +39,7 @@ class NowPlayingMovieAdapter :
         holder.bind(movie)
     }
 
-    class MovieViewHolder(private val binding: ItemMovieBinding) :
+    class MovieViewHolder(private val binding: ItemMovieBinding, val onItemClick: (NowPlayingMovieEntity) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(movie: NowPlayingMovieEntity) {
             with(binding) {
@@ -53,6 +51,7 @@ class NowPlayingMovieAdapter :
                             .error(R.drawable.ic_broken_img))
                     .into(ivPoster)
             }
+            itemView.setOnClickListener { onItemClick(movie) }
         }
     }
 }

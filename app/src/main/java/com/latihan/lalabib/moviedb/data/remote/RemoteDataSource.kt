@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.latihan.lalabib.moviedb.BuildConfig.apiKey
-import com.latihan.lalabib.moviedb.data.remote.response.NowPlayingMovieResponse
-import com.latihan.lalabib.moviedb.data.remote.response.PopularMovieResponse
-import com.latihan.lalabib.moviedb.data.remote.response.TopRatedMovieResponse
+import com.latihan.lalabib.moviedb.data.remote.response.*
 import com.latihan.lalabib.moviedb.networking.ApiConfig
 import retrofit2.Call
 import retrofit2.Callback
@@ -69,6 +67,48 @@ class RemoteDataSource {
         })
 
         return resultNowPlayingMovie
+    }
+
+    fun getDetailMovie(id: String): LiveData<ApiResponse<DetailMovieResponse>> {
+        val resultDetailMovie = MutableLiveData<ApiResponse<DetailMovieResponse>>()
+        ApiConfig.instance.getDetailMovie(id, apiKey).enqueue(object : Callback<DetailMovieResponse> {
+            override fun onResponse(call: Call<DetailMovieResponse>, response: Response<DetailMovieResponse>) {
+                if (response.isSuccessful) {
+                    response.body()?.let { resultDetailMovie.value = ApiResponse.success(it) }
+                } else {
+                    Log.e(TAG, "onFailure: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<DetailMovieResponse>, t: Throwable) {
+                Log.e(TAG, "onFailure: ${t.message}")
+            }
+        })
+
+        return resultDetailMovie
+    }
+
+    fun getReview(id: String, callback: LoadReviewCallback) {
+        ApiConfig.instance.getReview(id, apiKey).enqueue(object : Callback<ReviewResponse> {
+            override fun onResponse(
+                call: Call<ReviewResponse>,
+                response: Response<ReviewResponse>
+            ) {
+                if (response.isSuccessful) {
+                    response.body()?.let { callback.reviewReceived(it) }
+                } else {
+                    Log.e(TAG, "onFailure: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ReviewResponse>, t: Throwable) {
+                Log.e(TAG, "onFailure: ${t.message}")
+            }
+        })
+    }
+
+    interface LoadReviewCallback {
+        fun reviewReceived(reviewResponse: ReviewResponse)
     }
 
     companion object {

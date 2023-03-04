@@ -1,13 +1,8 @@
 package com.latihan.lalabib.moviedb.data.local.room
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.latihan.lalabib.moviedb.data.local.entity.NowPlayingMovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.PopularMovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.TopRatedMovieEntity
+import androidx.room.*
+import com.latihan.lalabib.moviedb.data.local.entity.*
 
 @Dao
 interface MovieDao {
@@ -29,4 +24,14 @@ interface MovieDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertNowPlayingMovies(movies: List<NowPlayingMovieEntity>)
+
+    @Transaction
+    @Query("SELECT * FROM popular_movie_entities WHERE id = :id " +
+            "UNION SELECT * FROM topRated_movie_entities WHERE id = :id " +
+            "UNION SELECT * FROM nowPlaying_movie_entities WHERE id = :id"
+    )
+    fun getDetailMovie(id: String): LiveData<MovieEntity>
+
+    @Update
+    fun updateMovie(movie: MovieEntity)
 }

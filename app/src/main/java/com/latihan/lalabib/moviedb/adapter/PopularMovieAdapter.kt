@@ -13,9 +13,8 @@ import com.latihan.lalabib.moviedb.data.local.entity.PopularMovieEntity
 import com.latihan.lalabib.moviedb.databinding.ItemPopularMovieBinding
 import com.latihan.lalabib.moviedb.utils.IMG_URL
 
-class PopularMovieAdapter : ListAdapter<PopularMovieEntity, PopularMovieAdapter.MovieViewHolder>(
-    DIFFUTIL
-) {
+class PopularMovieAdapter(private val onItemClick: (PopularMovieEntity) -> Unit) :
+    ListAdapter<PopularMovieEntity, PopularMovieAdapter.MovieViewHolder>(DIFFUTIL) {
 
     object DIFFUTIL : DiffUtil.ItemCallback<PopularMovieEntity>() {
         override fun areItemsTheSame(oldItem: PopularMovieEntity, newItem: PopularMovieEntity): Boolean {
@@ -25,17 +24,15 @@ class PopularMovieAdapter : ListAdapter<PopularMovieEntity, PopularMovieAdapter.
         override fun areContentsTheSame(oldItem: PopularMovieEntity, newItem: PopularMovieEntity): Boolean {
             return oldItem.id == newItem.id
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
-        return MovieViewHolder(
-            ItemPopularMovieBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+        val binding = ItemPopularMovieBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
+        return MovieViewHolder(binding, onItemClick)
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
@@ -44,16 +41,19 @@ class PopularMovieAdapter : ListAdapter<PopularMovieEntity, PopularMovieAdapter.
     }
 
 
-    class MovieViewHolder(private val binding: ItemPopularMovieBinding) :
+    class MovieViewHolder(private val binding: ItemPopularMovieBinding, val onItemClick: (PopularMovieEntity) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
-            fun bind(movie: PopularMovieEntity) {
-                with(binding) {
-                    Glide.with(itemView.context)
-                        .load(IMG_URL + movie.poster_path)
-                        .apply(RequestOptions.placeholderOf(R.drawable.ic_loading)
-                            .error(R.drawable.ic_broken_img))
-                        .into(ivPoster)
-                }
+        fun bind(movie: PopularMovieEntity) {
+            with(binding) {
+                Glide.with(itemView.context)
+                    .load(IMG_URL + movie.poster_path)
+                    .apply(
+                        RequestOptions.placeholderOf(R.drawable.ic_loading)
+                            .error(R.drawable.ic_broken_img)
+                    )
+                    .into(ivPoster)
             }
+            itemView.setOnClickListener { onItemClick(movie) }
+        }
     }
 }

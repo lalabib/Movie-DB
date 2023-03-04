@@ -12,7 +12,7 @@ import com.latihan.lalabib.moviedb.data.local.entity.TopRatedMovieEntity
 import com.latihan.lalabib.moviedb.databinding.ItemMovieBinding
 import com.latihan.lalabib.moviedb.utils.IMG_URL
 
-class TopRatedMovieAdapter: ListAdapter<TopRatedMovieEntity, TopRatedMovieAdapter.MovieViewHolder>(DIFFUTIL) {
+class TopRatedMovieAdapter(private val onItemClick: (TopRatedMovieEntity) -> Unit): ListAdapter<TopRatedMovieEntity, TopRatedMovieAdapter.MovieViewHolder>(DIFFUTIL) {
 
     object DIFFUTIL : DiffUtil.ItemCallback<TopRatedMovieEntity>() {
         override fun areItemsTheSame(oldItem: TopRatedMovieEntity, newItem: TopRatedMovieEntity): Boolean {
@@ -22,17 +22,15 @@ class TopRatedMovieAdapter: ListAdapter<TopRatedMovieEntity, TopRatedMovieAdapte
         override fun areContentsTheSame(oldItem: TopRatedMovieEntity, newItem: TopRatedMovieEntity): Boolean {
             return oldItem.id == newItem.id
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
-        return MovieViewHolder(
-            ItemMovieBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+        val binding = ItemMovieBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
+        return MovieViewHolder(binding, onItemClick)
     }
 
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
@@ -41,7 +39,7 @@ class TopRatedMovieAdapter: ListAdapter<TopRatedMovieEntity, TopRatedMovieAdapte
     }
 
 
-    class MovieViewHolder(private val binding: ItemMovieBinding) :
+    class MovieViewHolder(private val binding: ItemMovieBinding, val onItemClick: (TopRatedMovieEntity) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(movie: TopRatedMovieEntity) {
             with(binding) {
@@ -53,6 +51,7 @@ class TopRatedMovieAdapter: ListAdapter<TopRatedMovieEntity, TopRatedMovieAdapte
                         .error(R.drawable.ic_broken_img))
                     .into(ivPoster)
             }
+            itemView.setOnClickListener { onItemClick(movie) }
         }
     }
 }
