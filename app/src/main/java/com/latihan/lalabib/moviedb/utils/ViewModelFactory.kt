@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.latihan.lalabib.moviedb.data.MovieRepository
 import com.latihan.lalabib.moviedb.di.Injection
 import com.latihan.lalabib.moviedb.ui.detail.DetailViewModel
+import com.latihan.lalabib.moviedb.ui.favorite.FavoriteViewModel
 import com.latihan.lalabib.moviedb.ui.home.HomeViewModel
 
 class ViewModelFactory(private val movieRepository: MovieRepository) :
@@ -19,6 +20,9 @@ class ViewModelFactory(private val movieRepository: MovieRepository) :
             }
             modelClass.isAssignableFrom(DetailViewModel::class.java) -> {
                 DetailViewModel(movieRepository) as T
+            }
+            modelClass.isAssignableFrom(FavoriteViewModel::class.java) -> {
+                FavoriteViewModel(movieRepository) as T
             }
             else -> throw Throwable("Unknown ViewModel Class: $modelClass")
         }

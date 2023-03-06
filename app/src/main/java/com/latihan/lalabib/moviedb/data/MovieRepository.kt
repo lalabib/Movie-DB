@@ -3,111 +3,59 @@ package com.latihan.lalabib.moviedb.data
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.latihan.lalabib.moviedb.data.local.LocalDataSource
-import com.latihan.lalabib.moviedb.data.local.entity.MovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.NowPlayingMovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.PopularMovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.TopRatedMovieEntity
-import com.latihan.lalabib.moviedb.data.remote.ApiResponse
+import com.latihan.lalabib.moviedb.data.local.entity.*
 import com.latihan.lalabib.moviedb.data.remote.RemoteDataSource
 import com.latihan.lalabib.moviedb.data.remote.response.*
-import com.latihan.lalabib.moviedb.utils.AppExecutors
-import com.latihan.lalabib.moviedb.utils.Resource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MovieRepository(
     private val remoteDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource,
-    private val appExecutors: AppExecutors
 ): MovieDataSource {
 
-    override fun getPopularMovie(): LiveData<Resource<List<PopularMovieEntity>>> {
-        return object : NetworkBoundResource<List<PopularMovieEntity>, PopularMovieResponse>(appExecutors) {
-            override fun loadFromDB(): LiveData<List<PopularMovieEntity>> {
-                return localDataSource.getPopularMovie()
+    override fun getPopularMovie(): LiveData<MovieResponse> {
+        val popularMovie = MutableLiveData<MovieResponse>()
+        remoteDataSource.getPopularMovie(object : RemoteDataSource.LoadMovieCallback {
+            override fun movieReceived(movie: MovieResponse) {
+                popularMovie.postValue(movie)
             }
-
-            override fun shouldFetch(data: List<PopularMovieEntity>?): Boolean =
-                //data == null || data.isEmpty()
-                true //replace it with true if you want to always retrieve data from the internet
-
-            override fun createCall(): LiveData<ApiResponse<PopularMovieResponse>> {
-                return remoteDataSource.getPopularMovie()
-            }
-
-            override fun saveCallResult(data: PopularMovieResponse) {
-                localDataSource.insertPopularMovie(data.results)
-            }
-        }.asLiveData()
+        })
+        return popularMovie
     }
 
-    override fun getTopRatedMovie(): LiveData<Resource<List<TopRatedMovieEntity>>> {
-        return object : NetworkBoundResource<List<TopRatedMovieEntity>, TopRatedMovieResponse>(appExecutors) {
-            override fun loadFromDB(): LiveData<List<TopRatedMovieEntity>> {
-                return localDataSource.getTopRatedMovie()
+    override fun getTopRatedMovie(): LiveData<MovieResponse> {
+        val topRatedMovie = MutableLiveData<MovieResponse>()
+        remoteDataSource.getTopRatedMovie(object : RemoteDataSource.LoadMovieCallback {
+            override fun movieReceived(movie: MovieResponse) {
+                topRatedMovie.postValue(movie)
             }
-
-            override fun shouldFetch(data: List<TopRatedMovieEntity>?): Boolean =
-                //data == null || data.isEmpty()
-                true //replace it with true if you want to always retrieve data from the internet
-
-            override fun createCall(): LiveData<ApiResponse<TopRatedMovieResponse>> {
-                return remoteDataSource.getTopRatedMovie()
-            }
-
-            override fun saveCallResult(data: TopRatedMovieResponse) {
-                localDataSource.insertTopRatedMovie(data.results)
-            }
-        }.asLiveData()
+        })
+        return topRatedMovie
     }
 
-    override fun getNowPlayingMovie(): LiveData<Resource<List<NowPlayingMovieEntity>>> {
-        return object : NetworkBoundResource<List<NowPlayingMovieEntity>, NowPlayingMovieResponse>(appExecutors) {
-            override fun loadFromDB(): LiveData<List<NowPlayingMovieEntity>> {
-                return localDataSource.getNowPlayingMovie()
+    override fun getNowPlayingMovie(): LiveData<MovieResponse> {
+        val nowPlayingMovie = MutableLiveData<MovieResponse>()
+        remoteDataSource.getNowPlayingMovie(object : RemoteDataSource.LoadMovieCallback {
+            override fun movieReceived(movie: MovieResponse) {
+                nowPlayingMovie.postValue(movie)
             }
-
-            override fun shouldFetch(data: List<NowPlayingMovieEntity>?): Boolean =
-                //data == null || data.isEmpty()
-                true //replace it with true if you want to always retrieve data from the internet
-
-            override fun createCall(): LiveData<ApiResponse<NowPlayingMovieResponse>> {
-                return remoteDataSource.getNowPlayingMovie()
-            }
-
-            override fun saveCallResult(data: NowPlayingMovieResponse) {
-                localDataSource.insertNowPlayingMovie(data.results)
-            }
-        }.asLiveData()
+        })
+        return nowPlayingMovie
     }
 
-    override fun getDetailMovie(id: String): LiveData<Resource<MovieEntity>> {
-        return object : NetworkBoundResource<MovieEntity, DetailMovieResponse>(appExecutors) {
-            override fun loadFromDB(): LiveData<MovieEntity> {
-                return localDataSource.getDetailMovie(id)
+    override fun getDetailMovie(id: Int): LiveData<MovieEntity> {
+        val detailMovie = MutableLiveData<MovieEntity>()
+        remoteDataSource.getDetailMovie(id, object : RemoteDataSource.LoadDetailMovieCallback {
+            override fun detailMovieReceived(movieEntity: MovieEntity) {
+                detailMovie.postValue(movieEntity)
             }
-
-            override fun shouldFetch(data: MovieEntity?): Boolean {
-                return data == null
-            }
-
-            override fun createCall(): LiveData<ApiResponse<DetailMovieResponse>> {
-                return remoteDataSource.getDetailMovie(id)
-            }
-
-            override fun saveCallResult(data: DetailMovieResponse) {
-                val movie = MovieEntity(
-                    data.id,
-                    data.title,
-                    data.overview,
-                    data.releaseDate,
-                    data.voteAverage,
-                    data.posterPath
-                )
-                localDataSource.updateMovie(movie)
-            }
-        }.asLiveData()
+        })
+        return detailMovie
     }
 
-    override fun getReview(id: String): LiveData<ReviewResponse> {
+    override fun getReview(id: Int): LiveData<ReviewResponse> {
         val reviews = MutableLiveData<ReviewResponse>()
         remoteDataSource.getReview(id, object : RemoteDataSource.LoadReviewCallback {
             override fun reviewReceived(reviewResponse: ReviewResponse) {
@@ -117,6 +65,30 @@ class MovieRepository(
         return reviews
     }
 
+    override suspend fun addToFavorite(favMovie: FavMovieEntity) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val user = FavMovieEntity(
+                favMovie.id,
+                favMovie.title,
+                favMovie.overview,
+                favMovie.poster_path
+            )
+            localDataSource.addToFavorite(user)
+        }
+    }
+
+    override suspend fun checkUser(id: Int): Int {
+        return localDataSource.checkUser(id)
+    }
+
+    override fun getFavoriteMovie(): LiveData<List<FavMovieEntity>> {
+        return localDataSource.getFavoriteUser()
+    }
+
+    override suspend fun removeFromFavorite(id: Int): Int {
+        return localDataSource.removeFromFavorite(id)
+    }
+
     companion object {
         @Volatile
         private var instance: MovieRepository? = null
@@ -124,10 +96,9 @@ class MovieRepository(
         fun getInstance(
             remoteDataSource: RemoteDataSource,
             localDataSource: LocalDataSource,
-            appExecutors: AppExecutors
         ): MovieRepository =
             instance ?: synchronized(this) {
-                instance ?: MovieRepository(remoteDataSource, localDataSource, appExecutors)
+                instance ?: MovieRepository(remoteDataSource, localDataSource)
             }
     }
 }

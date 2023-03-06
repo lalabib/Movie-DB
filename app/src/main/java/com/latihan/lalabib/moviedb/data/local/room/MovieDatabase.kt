@@ -4,16 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.latihan.lalabib.moviedb.data.local.entity.MovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.NowPlayingMovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.PopularMovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.TopRatedMovieEntity
+import com.latihan.lalabib.moviedb.data.local.entity.*
 
 @Database(
-    entities = [PopularMovieEntity::class, TopRatedMovieEntity::class, NowPlayingMovieEntity::class, MovieEntity::class],
-    version = 5,
-    exportSchema = false
-)
+    entities = [FavMovieEntity::class],
+    version = 2,
+    exportSchema = false)
 abstract class MovieDatabase : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao

@@ -14,4 +14,9 @@
     <string name="review_empty">Review is empty</string>
     <string name="home_title">Movie</string>
     <string name="detail_title">Detail</string>
+    <string name="favorite_title">Favorite</string>
+    <string name="share_title">Share</string>
+    <string name="icon">Icon</string>
+    <string name="add_fav">Added to Favorites</string>
+    <string name="remove_fav">Removed from Favorites</string>
 </resources>

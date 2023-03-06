@@ -1,22 +1,27 @@
 package com.latihan.lalabib.moviedb.data
 
 import androidx.lifecycle.LiveData
-import com.latihan.lalabib.moviedb.data.local.entity.MovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.NowPlayingMovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.PopularMovieEntity
-import com.latihan.lalabib.moviedb.data.local.entity.TopRatedMovieEntity
+import com.latihan.lalabib.moviedb.data.local.entity.*
+import com.latihan.lalabib.moviedb.data.remote.response.MovieResponse
 import com.latihan.lalabib.moviedb.data.remote.response.ReviewResponse
-import com.latihan.lalabib.moviedb.utils.Resource
 
 interface MovieDataSource {
 
-    fun getPopularMovie(): LiveData<Resource<List<PopularMovieEntity>>>
+    fun getPopularMovie(): LiveData<MovieResponse>
 
-    fun getTopRatedMovie(): LiveData<Resource<List<TopRatedMovieEntity>>>
+    fun getTopRatedMovie(): LiveData<MovieResponse>
 
-    fun getNowPlayingMovie(): LiveData<Resource<List<NowPlayingMovieEntity>>>
+    fun getNowPlayingMovie(): LiveData<MovieResponse>
 
-    fun getDetailMovie(id: String): LiveData<Resource<MovieEntity>>
+    fun getDetailMovie(id: Int): LiveData<MovieEntity>
 
-    fun getReview(id: String): LiveData<ReviewResponse>
+    fun getReview(id: Int): LiveData<ReviewResponse>
+
+    suspend fun addToFavorite(favMovie: FavMovieEntity)
+
+    fun getFavoriteMovie(): LiveData<List<FavMovieEntity>>
+
+    suspend fun checkUser(id: Int): Int
+
+    suspend fun removeFromFavorite(id: Int): Int
 }

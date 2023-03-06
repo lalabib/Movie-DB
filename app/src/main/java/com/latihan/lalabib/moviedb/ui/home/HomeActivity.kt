@@ -3,17 +3,17 @@ package com.latihan.lalabib.moviedb.ui.home
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.latihan.lalabib.moviedb.R
-import com.latihan.lalabib.moviedb.adapter.NowPlayingMovieAdapter
 import com.latihan.lalabib.moviedb.adapter.PopularMovieAdapter
-import com.latihan.lalabib.moviedb.adapter.TopRatedMovieAdapter
+import com.latihan.lalabib.moviedb.adapter.MovieAdapter
 import com.latihan.lalabib.moviedb.databinding.ActivityHomeBinding
 import com.latihan.lalabib.moviedb.ui.detail.DetailActivity
-import com.latihan.lalabib.moviedb.utils.Status
+import com.latihan.lalabib.moviedb.ui.favorite.FavoriteActivity
 import com.latihan.lalabib.moviedb.utils.ViewModelFactory
 
 class HomeActivity : AppCompatActivity() {
@@ -49,22 +49,10 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
+        showLoading(true)
         homeViewModel.getPopularMovie().observe(this) { movie ->
-            if (movie != null) {
-                when (movie.status) {
-                    Status.LOADING -> {
-                        showLoading(true)
-                    }
-                    Status.SUCCESS -> {
-                        showLoading(false)
-                        popularMovieAdapter.submitList(movie.data)
-                    }
-                    Status.ERROR -> {
-                        showLoading(false)
-                        Toast.makeText(this, movie.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
+            popularMovieAdapter.submitList(movie.results)
+            showLoading(false)
         }
 
         binding.apply {
@@ -75,29 +63,17 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupTopRatedMovie() {
-        val topRatedMovieAdapter = TopRatedMovieAdapter {
+        val topRatedMovieAdapter = MovieAdapter {
             Intent(this@HomeActivity, DetailActivity::class.java).apply {
                 putExtra(DetailActivity.EXTRA_DATA, it.id)
                 startActivity(this)
             }
         }
 
+        showLoading(true)
         homeViewModel.getTopRatedMovie().observe(this) { movie ->
-            if (movie != null) {
-                when (movie.status) {
-                    Status.LOADING -> {
-                        showLoading(true)
-                    }
-                    Status.SUCCESS -> {
-                        showLoading(false)
-                        topRatedMovieAdapter.submitList(movie.data)
-                    }
-                    Status.ERROR -> {
-                        showLoading(false)
-                        Toast.makeText(this, movie.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
+            topRatedMovieAdapter.submitList(movie.results)
+            showLoading(false)
         }
 
         binding.apply {
@@ -108,29 +84,17 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupNowPlayingMovie() {
-        val nowPlayingMovieAdapter = NowPlayingMovieAdapter {
+        val nowPlayingMovieAdapter = MovieAdapter {
             Intent(this@HomeActivity, DetailActivity::class.java).apply {
                 putExtra(DetailActivity.EXTRA_DATA, it.id)
                 startActivity(this)
             }
         }
 
+        showLoading(true)
         homeViewModel.getNowPlayingMovie().observe(this) { movie ->
-            if (movie != null) {
-                when (movie.status) {
-                    Status.LOADING -> {
-                        showLoading(true)
-                    }
-                    Status.SUCCESS -> {
-                        showLoading(false)
-                        nowPlayingMovieAdapter.submitList(movie.data)
-                    }
-                    Status.ERROR -> {
-                        showLoading(false)
-                        Toast.makeText(this, movie.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
+            nowPlayingMovieAdapter.submitList(movie.results)
+            showLoading(false)
         }
 
         binding.apply {
@@ -142,5 +106,22 @@ class HomeActivity : AppCompatActivity() {
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.home_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.favorite -> {
+                Intent(this@HomeActivity, FavoriteActivity::class.java).apply {
+                    startActivity(this)
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

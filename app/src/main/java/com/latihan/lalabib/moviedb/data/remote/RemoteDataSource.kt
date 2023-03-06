@@ -1,9 +1,8 @@
 package com.latihan.lalabib.moviedb.data.remote
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.latihan.lalabib.moviedb.BuildConfig.apiKey
+import com.latihan.lalabib.moviedb.data.local.entity.MovieEntity
 import com.latihan.lalabib.moviedb.data.remote.response.*
 import com.latihan.lalabib.moviedb.networking.ApiConfig
 import retrofit2.Call
@@ -12,83 +11,71 @@ import retrofit2.Response
 
 class RemoteDataSource {
 
-    fun getPopularMovie(): LiveData<ApiResponse<PopularMovieResponse>> {
-        val resultPopularMovie = MutableLiveData<ApiResponse<PopularMovieResponse>>()
-        ApiConfig.instance.getPopularMovie(apiKey).enqueue(object : Callback<PopularMovieResponse> {
-            override fun onResponse(call: Call<PopularMovieResponse>, response: Response<PopularMovieResponse>) {
+    fun getPopularMovie(callback: LoadMovieCallback) {
+        ApiConfig.instance.getPopularMovie(apiKey).enqueue(object : Callback<MovieResponse> {
+            override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
                 if (response.isSuccessful) {
-                    response.body()?.let { resultPopularMovie.value = ApiResponse.success(it) }
+                    response.body()?.let { callback.movieReceived(it) }
                 } else {
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<PopularMovieResponse>, t: Throwable) {
+            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
-
-        return resultPopularMovie
     }
 
-    fun getTopRatedMovie(): LiveData<ApiResponse<TopRatedMovieResponse>> {
-        val resultTopRatedMovie = MutableLiveData<ApiResponse<TopRatedMovieResponse>>()
-        ApiConfig.instance.getTopRatedMovie(apiKey).enqueue(object : Callback<TopRatedMovieResponse> {
-            override fun onResponse(call: Call<TopRatedMovieResponse>, response: Response<TopRatedMovieResponse>) {
+    fun getTopRatedMovie(callback: LoadMovieCallback) {
+        ApiConfig.instance.getTopRatedMovie(apiKey).enqueue(object : Callback<MovieResponse> {
+            override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
                 if (response.isSuccessful) {
-                    response.body()?.let { resultTopRatedMovie.value = ApiResponse.success(it) }
+                    response.body()?.let { callback.movieReceived(it) }
                 } else {
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<TopRatedMovieResponse>, t: Throwable) {
+            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
-
-        return resultTopRatedMovie
     }
 
-    fun getNowPlayingMovie(): LiveData<ApiResponse<NowPlayingMovieResponse>> {
-        val resultNowPlayingMovie = MutableLiveData<ApiResponse<NowPlayingMovieResponse>>()
-        ApiConfig.instance.getNowPlayingMovie(apiKey).enqueue(object : Callback<NowPlayingMovieResponse> {
-            override fun onResponse(call: Call<NowPlayingMovieResponse>, response: Response<NowPlayingMovieResponse>) {
+    fun getNowPlayingMovie(callback: LoadMovieCallback) {
+        ApiConfig.instance.getNowPlayingMovie(apiKey).enqueue(object : Callback<MovieResponse> {
+            override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
                 if (response.isSuccessful) {
-                    response.body()?.let { resultNowPlayingMovie.value = ApiResponse.success(it) }
+                    response.body()?.let { callback.movieReceived(it) }
                 } else {
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<NowPlayingMovieResponse>, t: Throwable) {
+            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
-
-        return resultNowPlayingMovie
     }
 
-    fun getDetailMovie(id: String): LiveData<ApiResponse<DetailMovieResponse>> {
-        val resultDetailMovie = MutableLiveData<ApiResponse<DetailMovieResponse>>()
-        ApiConfig.instance.getDetailMovie(id, apiKey).enqueue(object : Callback<DetailMovieResponse> {
-            override fun onResponse(call: Call<DetailMovieResponse>, response: Response<DetailMovieResponse>) {
+    fun getDetailMovie(id: Int, callback: LoadDetailMovieCallback) {
+        ApiConfig.instance.getDetailMovie(id, apiKey).enqueue(object : Callback<MovieEntity> {
+            override fun onResponse(call: Call<MovieEntity>, response: Response<MovieEntity>) {
                 if (response.isSuccessful) {
-                    response.body()?.let { resultDetailMovie.value = ApiResponse.success(it) }
+                    response.body()?.let { callback.detailMovieReceived(it) }
                 } else {
                     Log.e(TAG, "onFailure: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<DetailMovieResponse>, t: Throwable) {
+            override fun onFailure(call: Call<MovieEntity>, t: Throwable) {
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
-
-        return resultDetailMovie
     }
 
-    fun getReview(id: String, callback: LoadReviewCallback) {
+    fun getReview(id: Int, callback: LoadReviewCallback) {
         ApiConfig.instance.getReview(id, apiKey).enqueue(object : Callback<ReviewResponse> {
             override fun onResponse(
                 call: Call<ReviewResponse>,
@@ -105,6 +92,14 @@ class RemoteDataSource {
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
+    }
+
+    interface  LoadMovieCallback {
+        fun movieReceived(movie: MovieResponse)
+    }
+
+    interface  LoadDetailMovieCallback {
+        fun detailMovieReceived(movieEntity: MovieEntity)
     }
 
     interface LoadReviewCallback {

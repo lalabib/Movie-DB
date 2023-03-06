@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -15,12 +14,12 @@
             android:id="@+id/iv_poster_detail"
             android:layout_width="match_parent"
             android:layout_height="425dp"
-            android:scaleType="fitXY"
             android:contentDescription="@string/poster"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:scaleType="fitXY"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:src="@tools:sample/backgrounds/scenic"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/backgrounds/scenic" />
 
         <TextView
             android:id="@+id/tv_title"
@@ -37,29 +36,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_poster_detail" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_view"
-            android:layout_width="65dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="4dp"
+        <CheckBox
+            android:id="@+id/ic_favorite"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="10dp"
-            app:cardCornerRadius="6dp"
-            android:backgroundTint="@color/blue_500"
+            android:contentDescription="@string/icon"
+            android:button="@drawable/selector_favorite"
+            app:useMaterialThemeColors="false"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_poster_detail">
-
-            <TextView
-                android:id="@+id/tv_rate"
-                style="@style/tv_color"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_gravity="center"
-                android:text="@string/vote_average"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                app:drawableEndCompat="@drawable/ic_star"/>
-        </androidx.cardview.widget.CardView>
+            app:layout_constraintTop_toBottomOf="@id/iv_poster_detail" />
 
         <TextView
             android:id="@+id/tv_release_date_title"
@@ -67,11 +54,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
+            android:text="@string/release_date_title"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:text="@string/release_date_title"
-            app:layout_constraintTop_toBottomOf="@id/tv_title"
-            app:layout_constraintStart_toStartOf="@id/tv_title"/>
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
         <TextView
             android:id="@+id/tv_release_date"
@@ -79,10 +66,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textSize="16sp"
             android:text="@string/release_date"
-            app:layout_constraintTop_toBottomOf="@id/tv_release_date_title"
-            app:layout_constraintStart_toStartOf="@id/tv_title"/>
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_release_date_title" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_view"
+            android:layout_width="65dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="10dp"
+            android:backgroundTint="@color/blue_500"
+            app:cardCornerRadius="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ic_favorite">
+
+            <TextView
+                android:id="@+id/tv_rate"
+                style="@style/tv_color"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:text="@string/vote_average"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:drawableEndCompat="@drawable/ic_star" />
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/tv_overview_title"
@@ -90,25 +101,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
+            android:text="@string/description_title"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:text="@string/description_title"
-            app:layout_constraintTop_toBottomOf="@id/tv_release_date"
-            app:layout_constraintStart_toStartOf="@id/tv_title"/>
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_release_date" />
 
         <TextView
             android:id="@+id/tv_overview"
             style="@style/tv_color"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="2dp"
-            android:layout_marginStart="2dp"
-            android:textSize="16sp"
             android:text="@string/description"
-            app:layout_constraintTop_toBottomOf="@id/tv_overview_title"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/card_view"
             app:layout_constraintStart_toStartOf="@id/tv_title"
-            app:layout_constraintEnd_toEndOf="@id/card_view" />
+            app:layout_constraintTop_toBottomOf="@id/tv_overview_title" />
 
         <TextView
             android:id="@+id/tv_review_title"
@@ -116,44 +127,44 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
+            android:text="@string/review"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:text="@string/review"
-            app:layout_constraintTop_toBottomOf="@id/tv_overview"
-            app:layout_constraintStart_toStartOf="@id/tv_title"/>
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_overview" />
 
         <TextView
             android:id="@+id/tv_review"
             style="@style/tv_color"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="2dp"
-            android:layout_marginStart="2dp"
             android:layout_marginBottom="20dp"
-            android:textSize="16sp"
             android:text="@string/description"
-            app:layout_constraintTop_toBottomOf="@id/tv_review_title"
-            app:layout_constraintStart_toStartOf="@id/tv_title"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/card_view"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_review_title" />
 
         <TextView
             android:id="@+id/tv_review_empty"
             style="@style/tv_color"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="2dp"
-            android:layout_marginStart="2dp"
             android:layout_marginBottom="20dp"
+            android:text="@string/review_empty"
             android:textSize="16sp"
             android:visibility="invisible"
-            android:text="@string/review_empty"
-            app:layout_constraintTop_toBottomOf="@id/tv_review_title"
-            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/card_view"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_review_title" />
 
         <ProgressBar
             android:id="@+id/progress_bar"

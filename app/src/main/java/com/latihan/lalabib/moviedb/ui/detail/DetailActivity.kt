@@ -12,8 +12,11 @@ import com.latihan.lalabib.moviedb.data.local.entity.MovieEntity
 import com.latihan.lalabib.moviedb.data.local.entity.ReviewEntity
 import com.latihan.lalabib.moviedb.databinding.ActivityDetailBinding
 import com.latihan.lalabib.moviedb.utils.IMG_URL
-import com.latihan.lalabib.moviedb.utils.Status
 import com.latihan.lalabib.moviedb.utils.ViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DetailActivity : AppCompatActivity() {
 
@@ -45,36 +48,25 @@ class DetailActivity : AppCompatActivity() {
     private fun setupData() {
         val extras = intent.extras
         if (extras != null) {
-            val id = extras.getString(EXTRA_DATA)
-            if (id != null) {
-                detailViewModel.setMovieData(id)
-                detailViewModel.setReviewsData(id)
+            val id = extras.getInt(EXTRA_DATA)
 
-                detailViewModel.detailMovie.observe(this) { detailMovie ->
-                    when (detailMovie.status) {
-                        Status.LOADING -> {
-                            showLoading(true)
-                        }
-                        Status.SUCCESS -> {
-                            showLoading(false)
-                            detailMovie.data?.let { populatedDetailMovie(it) }
+            detailViewModel.setMovieData(id)
+            detailViewModel.setReviewsData(id)
 
-                            detailViewModel.reviewData.observe(this) { review ->
-                                if (review.results.isEmpty()) {
-                                    binding.apply {
-                                        tvReview.visibility = View.GONE
-                                        tvReviewEmpty.visibility = View.VISIBLE
-                                    }
-                                } else {
-                                    review.results.first().let { populatedReviewData(it) }
-                                }
-                            }
-                        }
-                        Status.ERROR -> {
-                            showLoading(false)
-                            Toast.makeText(this@DetailActivity, detailMovie.message, Toast.LENGTH_SHORT).show()
-                        }
+            showLoading(true)
+            detailViewModel.detailMovie.observe(this) { detailMovie ->
+                detailMovie?.let { populatedDetailMovie(it) }
+                showLoading(false)
+            }
+
+            detailViewModel.reviewData.observe(this) { review ->
+                if (review.results.isEmpty()) {
+                    binding.apply {
+                        tvReview.visibility = View.GONE
+                        tvReviewEmpty.visibility = View.VISIBLE
                     }
+                } else {
+                    review.results.first().let { populatedReviewData(it) }
                 }
             }
         }
@@ -83,15 +75,48 @@ class DetailActivity : AppCompatActivity() {
     private fun populatedDetailMovie(movie: MovieEntity) {
         binding.apply {
             tvTitle.text = movie.title
-            tvRate.text = movie.vote_average
+            tvRate.text = movie.vote_average.toString().substring(0, 3)
             tvReleaseDate.text = movie.release_date
             tvOverview.text = movie.overview
 
             Glide.with(this@DetailActivity)
                 .load(IMG_URL + movie.poster_path)
-                .apply(RequestOptions.placeholderOf(R.drawable.ic_loading)
-                    .error(R.drawable.ic_broken_img))
+                .apply(
+                    RequestOptions.placeholderOf(R.drawable.ic_loading)
+                        .error(R.drawable.ic_broken_img)
+                )
                 .into(ivPosterDetail)
+        }
+
+        val id = movie.id!!.toInt()
+        val title = movie.title.toString()
+        val overview = movie.overview.toString()
+        val poster = movie.poster_path.toString()
+
+        var isCheck = false
+        CoroutineScope(Dispatchers.IO).launch {
+            val count = detailViewModel.checkUser(id)
+            withContext(Dispatchers.Main) {
+                if (count > 0) {
+                    binding.icFavorite.isChecked = true
+                    isCheck = true
+                } else {
+                    binding.icFavorite.isChecked = false
+                    isCheck = false
+                }
+            }
+        }
+
+        binding.icFavorite.setOnClickListener {
+            isCheck = !isCheck
+            if (isCheck) {
+                detailViewModel.addToFavorite(id, title, overview, poster)
+                Toast.makeText(this@DetailActivity, R.string.add_fav, Toast.LENGTH_SHORT).show()
+            } else {
+                detailViewModel.removeFromFavorite(id)
+                Toast.makeText(this@DetailActivity, R.string.remove_fav, Toast.LENGTH_SHORT).show()
+            }
+            binding.icFavorite.isChecked = isCheck
         }
     }
 
