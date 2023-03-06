@@ -2,6 +2,7 @@ package com.latihan.lalabib.moviedb.ui.favorite
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,8 +44,11 @@ class FavoriteActivity : AppCompatActivity() {
         favViewModel.getFavoriteMovie().observe(this) {
             if(it.isNotEmpty()) {
                 favAdapter.submitList(it)
+                binding.ivEmpty.visibility = View.GONE
+                binding.tvEmpty.visibility = View.GONE
             } else{
-                Toast.makeText(this, "kosong", Toast.LENGTH_SHORT).show()
+                binding.tvEmpty.visibility = View.VISIBLE
+                binding.ivEmpty.visibility = View.VISIBLE
             }
         }
 

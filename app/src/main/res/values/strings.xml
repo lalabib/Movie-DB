@@ -19,6 +19,7 @@
     <string name="icon">Icon</string>
     <string name="add_fav">Added to Favorites</string>
     <string name="remove_fav">Removed from Favorites</string>
+    <string name="empty">lets add your favorite movie</string>
     <string name="title_bottom_sheet">please click the button to share the movie</string>
     <string name="share_text">please visit the following link for more info: %s</string>
 </resources>
