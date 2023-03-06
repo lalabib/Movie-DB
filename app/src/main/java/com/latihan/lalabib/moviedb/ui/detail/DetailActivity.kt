@@ -1,12 +1,19 @@
 package com.latihan.lalabib.moviedb.ui.detail
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.latihan.lalabib.moviedb.R
 import com.latihan.lalabib.moviedb.data.local.entity.MovieEntity
 import com.latihan.lalabib.moviedb.data.local.entity.ReviewEntity
@@ -72,15 +79,20 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("InflateParams")
     private fun populatedDetailMovie(movie: MovieEntity) {
+        val title = movie.title.toString()
+        val overview = movie.overview.toString()
+        val poster = movie.poster_path.toString()
+
         binding.apply {
-            tvTitle.text = movie.title
+            tvTitle.text = title
             tvRate.text = movie.vote_average.toString().substring(0, 3)
             tvReleaseDate.text = movie.release_date
-            tvOverview.text = movie.overview
+            tvOverview.text = overview
 
             Glide.with(this@DetailActivity)
-                .load(IMG_URL + movie.poster_path)
+                .load(IMG_URL + poster)
                 .apply(
                     RequestOptions.placeholderOf(R.drawable.ic_loading)
                         .error(R.drawable.ic_broken_img)
@@ -88,10 +100,8 @@ class DetailActivity : AppCompatActivity() {
                 .into(ivPosterDetail)
         }
 
+        // favorite movie
         val id = movie.id!!.toInt()
-        val title = movie.title.toString()
-        val overview = movie.overview.toString()
-        val poster = movie.poster_path.toString()
 
         var isCheck = false
         CoroutineScope(Dispatchers.IO).launch {
@@ -118,6 +128,44 @@ class DetailActivity : AppCompatActivity() {
             }
             binding.icFavorite.isChecked = isCheck
         }
+
+        //share movie
+        binding.icShare.setOnClickListener {
+            val dialog = BottomSheetDialog(this)
+            val view = layoutInflater.inflate(R.layout.bottom_sheet_share, null)
+
+            val btnClose = view.findViewById<ImageView>(R.id.ic_close)
+            val btnShare = view.findViewById<Button>(R.id.btn_share)
+            val bsPoster = view.findViewById<ImageView>(R.id.iv_bs_poster)
+            val bsTitle = view.findViewById<TextView>(R.id.tv_bs_title)
+
+            bsTitle.text = title
+            Glide.with(this@DetailActivity)
+                .load(IMG_URL + poster)
+                .apply(
+                    RequestOptions.placeholderOf(R.drawable.ic_loading)
+                        .error(R.drawable.ic_broken_img)
+                )
+                .into(bsPoster)
+
+            btnClose.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            btnShare.setOnClickListener {
+                val shareIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text, movie.homepage))
+                }
+                val share = Intent.createChooser(shareIntent, getString(R.string.app_name))
+                startActivity(share)
+            }
+
+            dialog.setCancelable(false)
+            dialog.setContentView(view)
+            dialog.show()
+        }
     }
 
     private fun populatedReviewData(review: ReviewEntity) {
@@ -127,6 +175,7 @@ class DetailActivity : AppCompatActivity() {
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
+
 
     override fun onSupportNavigateUp(): Boolean {
         finish()

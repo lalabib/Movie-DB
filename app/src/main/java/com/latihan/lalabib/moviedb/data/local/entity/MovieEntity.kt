@@ -23,6 +23,9 @@ data class MovieEntity(
 
     @SerializedName("vote_average")
     val vote_average: Double? = null,
+
+    @SerializedName("homepage")
+    val homepage: String? = null
 )
 
 @Entity(tableName = "fav_movie")
